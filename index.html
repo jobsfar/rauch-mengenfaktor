@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Düngemengenrechner für Rauch MDS</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="calculation.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+    <main class="container">
+        <h2>Düngemengenrechner für Rauch MDS</h2>
+        <p><i>Dieser Rechner basiert auf der Berechnungsmethode für Rauch MDS Düngerstreuer, ist jedoch nicht von Rauch hergestellt oder unterstützt.</i></p>
+
+        <label>Arbeitsbreite (m):
+            <input type="number" id="workingWidth" value="24" min="6" max="36" step="1">
+            <input type="range" id="workingWidthSlider" min="6" max="36" step="1" value="24">
+        </label>
+
+        <label>Ausbringmenge (kg/ha):
+            <input type="number" id="applicationRate" value="200" min="50" max="500" step="10">
+            <input type="range" id="applicationRateSlider" min="50" max="500" step="10" value="200">
+        </label>
+
+        <label>Fahrgeschwindigkeit (km/h):
+            <input type="number" id="speed" value="10" min="5" max="20" step="0.1">
+            <input type="range" id="speedSlider" min="5" max="20" step="0.1" value="10">
+        </label>
+
+        <label>Mengenkorrektur (%)</label>
+        <input type="range" id="correctionFactorSlider" min="3" max="10" step="1" value="5">
+        <span id="correctionFactorValue">5%</span>
+
+        <h3>Massenstrom: <span id="massFlow">-</span> kg/min</h3>
+        <h3>Mengenfaktor: <span id="factor">-</span></h3>
+
+        <h3 id="correctionMessage">Menge entspricht der Standard-Einstellung</h3>
+
+        <h3>Faktortabelle (laut Rauch-Dokumentation)</h3>
+        <div id="tableContainer"></div>
+    </main>
+
+</body>
+</html>
