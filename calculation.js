@@ -1,30 +1,41 @@
+const rauchFactorTable = {
+    20:  {3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2, 9: 2, 10: 2},
+    30:  {3: 1, 4: 1, 5: 2, 6: 2, 7: 2, 8: 3, 9: 3, 10: 3},
+    40:  {3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 3, 9: 4, 10: 4},
+    50:  {3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 5, 10: 5},
+    80:  {3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8, 10: 9},
+    100: {3: 3, 4: 4, 5: 5, 6: 6, 7: 8, 8: 9, 9: 10, 10: 11},
+    125: {3: 4, 4: 5, 5: 7, 6: 8, 7: 9, 8: 11, 9: 12, 10: 14},
+    150: {3: 5, 4: 6, 5: 8, 6: 10, 7: 11, 8: 13, 9: 15},
+    175: {3: 5, 4: 7, 5: 9, 6: 11, 7: 13, 8: 15, 9: 17},
+    200: {3: 6, 4: 8, 5: 11, 6: 13, 7: 15, 8: 17},
+    250: {3: 8, 4: 10, 5: 13, 6: 16, 7: 19, 8: 22},
+    300: {3: 9, 4: 13, 5: 16, 6: 19, 7: 23},
+    350: {3: 11, 4: 15, 5: 18, 6: 22},
+};
+
 function calculateMassFlow(workingWidth, applicationRate, speed) {
     return Math.round((workingWidth * applicationRate * speed) / 600);
 }
 
 function determineFactor(massFlow, correctionFactor) {
-    const rauchFactorTable = [
-        [20, 1, 1, 1, 2, 2, 2, 3, 3], 
-        [30, 1, 2, 2, 3, 3, 4, 4, 5], 
-        [40, 2, 2, 3, 4, 4, 5, 6, 6], 
-        [50, 2, 3, 4, 5, 5, 6, 7, 8], 
-        [80, 3, 4, 5, 6, 7, 8, 9, 10], 
-        [100, 4, 5, 6, 8, 9, 10, 11, 12], 
-        [125, 5, 6, 7, 9, 10, 12, 13, 14], 
-        [150, 6, 7, 8, 10, 11, 13, 15, 16], 
-        [175, 7, 8, 9, 11, 13, 15, 17, 18], 
-        [200, 8, 9, 11, 13, 15, 17, 19, 22], 
-        [250, 10, 11, 13, 16, 19, 22, 23, 23], 
-        [300, 13, 14, 16, 19, 23, 23, 23, 23], 
-        [350, 15, 16, 18, 22, 23, 23, 23, 23]
-    ];
-
-    // Passenden Faktor für die gegebene Massenstrom-Zahl finden
-    for (let i = 0; i < rauchFactorTable.length; i++) {
-        if (massFlow <= rauchFactorTable[i][0]) {
-            return rauchFactorTable[i][correctionFactor - 3]; // Index anpassen für 3%-10%
-        }
+    if (massFlow < 20 || massFlow > 350) {
+        return "Fehler: Massenstrom außerhalb des gültigen Bereichs (20 - 350 kg/min)";
     }
 
-    return 23; // Maximaler Faktor laut Tabelle
+    let massFlowValues = Object.keys(rauchFactorTable).map(Number);
+
+    // Finde den nächstgelegenen Wert
+    let closestMassFlow = massFlowValues.reduce((prev, curr) =>
+        Math.abs(curr - massFlow) < Math.abs(prev - massFlow) ? curr : prev
+    );
+
+    // Speichern des gerundeten Wertes für die Anzeige
+    window.roundedMassFlow = closestMassFlow;
+
+    if (rauchFactorTable[closestMassFlow][correctionFactor] !== undefined) {
+        return rauchFactorTable[closestMassFlow][correctionFactor];
+    } else {
+        return "Fehler: Korrekturfaktor nicht in Tabelle";
+    }
 }

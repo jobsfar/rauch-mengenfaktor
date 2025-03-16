@@ -1,21 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let correctionFactor = 5;
-
-    const rauchFactorTable = [
-        [20, 1, 1, 1, 2, 2, 2, 3, 3], 
-        [30, 1, 2, 2, 3, 3, 4, 4, 5], 
-        [40, 2, 2, 3, 4, 4, 5, 6, 6], 
-        [50, 2, 3, 4, 5, 5, 6, 7, 8], 
-        [80, 3, 4, 5, 6, 7, 8, 9, 10], 
-        [100, 4, 5, 6, 8, 9, 10, 11, 12], 
-        [125, 5, 6, 7, 9, 10, 12, 13, 14], 
-        [150, 6, 7, 8, 10, 11, 13, 15, 16], 
-        [175, 7, 8, 9, 11, 13, 15, 17, 18], 
-        [200, 8, 9, 11, 13, 15, 17, 19, 22], 
-        [250, 10, 11, 13, 16, 19, 22, 23, 23], 
-        [300, 13, 14, 16, 19, 23, 23, 23, 23], 
-        [350, 15, 16, 18, 22, 23, 23, 23, 23]
-    ];
+    let correctionFactor = 6; // Standardwert für Mengenkorrektur
 
     function updateResults() {
         let workingWidth = parseFloat(document.getElementById('workingWidth').value);
@@ -27,37 +11,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('massFlow').innerText = massFlow.toFixed(2);
         document.getElementById('factor').innerText = factor;
+        document.getElementById('roundedMassFlow').innerText = `Gerundet auf: ${window.roundedMassFlow} kg/min`;
 
-        // Anzeige aktualisieren
-        updateCorrectionDisplay(correctionFactor);
+        // Fehleranzeige
+        if (typeof factor === "string" && factor.startsWith("Fehler")) {
+            document.getElementById('factor').style.color = "red";
+        } else {
+            document.getElementById('factor').style.color = "black";
+        }
     }
 
-    function updateCorrectionDisplay(factor) {
-        let message = "";
-        if (factor > 5) {
-            message = "Mehr Menge ausgebracht";
-        } else if (factor < 5) {
-            message = "Weniger Menge ausgebracht";
-        } else {
-            message = "Menge entspricht der Standard-Einstellung";
+    function displayTable() {
+        let tableHTML = "<table border='1'><thead>";
+        
+        // Erste Header-Zeile für Mengenkorrektur
+        tableHTML += "<tr><th rowspan='2'>Massenstrom (kg/min)</th><th colspan='8'>Mengenkorrektur (%)</th></tr>";
+    
+        // Zweite Header-Zeile mit Prozentwerten
+        tableHTML += "<tr>";
+        for (let i = 3; i <= 10; i++) {
+            tableHTML += `<th>${i}%</th>`;
         }
-        document.getElementById("correctionMessage").innerText = message;
+        tableHTML += "</tr></thead><tbody>";
+    
+        // Tabellenwerte aus der Rauch-Tabelle einfügen
+        for (const [massFlow, factors] of Object.entries(rauchFactorTable)) {
+            tableHTML += `<tr><td>${massFlow}</td>`;
+            for (let i = 3; i <= 10; i++) {
+                tableHTML += `<td>${factors[i] !== undefined ? factors[i] : "-"}</td>`;
+            }
+            tableHTML += "</tr>";
+        }
+    
+        tableHTML += "</tbody></table>";
+        document.getElementById("tableContainer").innerHTML = tableHTML;
+    }
+    
+    
+
+    function syncInputAndSlider(inputId, sliderId) {
+        let input = document.getElementById(inputId);
+        let slider = document.getElementById(sliderId);
+
+        input.addEventListener("input", function () {
+            slider.value = input.value;
+            updateResults();
+        });
+
+        slider.addEventListener("input", function () {
+            input.value = slider.value;
+            updateResults();
+        });
     }
 
     function attachEventListeners() {
-        ["workingWidth", "applicationRate", "speed"].forEach(id => {
-            let input = document.getElementById(id);
-            let slider = document.getElementById(id + "Slider");
-
-            input.addEventListener("input", updateResults);
-            slider.addEventListener("input", function () {
-                input.value = this.value;
-                updateResults();
-            });
-        });
+        syncInputAndSlider("workingWidth", "workingWidthSlider");
+        syncInputAndSlider("applicationRate", "applicationRateSlider");
+        syncInputAndSlider("speed", "speedSlider");
 
         let correctionSlider = document.getElementById('correctionFactorSlider');
         let correctionDisplay = document.getElementById('correctionFactorValue');
+
+        correctionSlider.value = correctionFactor; // Standard auf 6% setzen
+        correctionDisplay.innerText = `${correctionFactor}%`;
 
         correctionSlider.addEventListener("input", function () {
             correctionFactor = parseInt(this.value);
@@ -66,26 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function loadTable() {
-        let tableHTML = "<table><thead><tr><th>Massenstrom (kg/min)</th>";
-        for (let i = 3; i <= 10; i++) {
-            tableHTML += `<th>Korrektur ${i}%</th>`;
-        }
-        tableHTML += "</tr></thead><tbody>";
-
-        rauchFactorTable.forEach(row => {
-            tableHTML += "<tr>";
-            row.forEach(value => {
-                tableHTML += `<td>${value === 23 ? "23" : value === "" ? "-1" : value}</td>`;
-            });
-            tableHTML += "</tr>";
-        });
-
-        tableHTML += "</tbody></table>";
-        document.getElementById("tableContainer").innerHTML = tableHTML;
-    }
-
     attachEventListeners();
     updateResults();
-    loadTable();
+    displayTable();
 });
