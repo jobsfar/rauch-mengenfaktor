@@ -10,8 +10,20 @@
 </head>
 <body>
 
+    <header class="header">
+        <h1>Düngemengenrechner</h1>
+        <div class="header-controls">
+            <span id="favoriteIcon" class="favorite-icon">⭐</span>
+            <button id="toggleTheme">🌙 Dark Mode</button>
+            <button id="loadFavoritesButton" style="display: none;">📂 Favoriten laden</button>
+            <button id="loadFavoritesButton" style="display: none;">📂 Favoriten laden</button>
+            <div id="favoritesDropdown" class="dropdown-menu" style="display: none;">
+                <ul id="favoritesList"></ul>
+            </div>
+        </div>
+    </header>
+
     <main class="container">
-        <h2>Düngemengenrechner für Rauch MDS</h2>
         <p><i>Dieser Rechner basiert auf der Berechnungsmethode für Rauch MDS Düngerstreuer, ist jedoch nicht von Rauch hergestellt oder unterstützt.</i></p>
         
         <h3>Berechnungsformel:</h3>
@@ -65,11 +77,12 @@
         <h3>Massenstrom: <span id="massFlow">-</span> kg/min</h3>
         <h4 id="roundedMassFlow">Gerundet auf: - kg/min</h4>
         <h3>Mengenfaktor: <span id="factor">-</span></h3>
-        
+
         <h3>Faktortabelle (laut Rauch-Dokumentation)</h3>
         <div class="table-container">
             <div id="tableContainer"></div> 
-        </div> 
+        </div>    
+
     </main>
 
 </body>
